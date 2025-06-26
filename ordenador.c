@@ -2,8 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Funcao para comparacao de numeros
 int comp(const void *a, const void *b) {
     return (*(int *)a - *(int *)b);
+}
+
+//Funcao de comparação para strings
+int comp_str(const void *a, const void *b) {
+    const char *str1 = *(const char **)a;
+    const char *str2 = *(const char **)b;
+    return strcmp(str1, str2);
 }
 
 int main(int argc, char* argv[]) {
@@ -42,92 +50,82 @@ int main(int argc, char* argv[]) {
         printf("Nao foi possivel criar/abrir o arquivo de resultados");
     }
 
+// PARTE DOS NOMES ---
+
     if (strcmp(argv[1], "-s") == 0) {
-        // Caso seja um arquivo de texto
+        // Caso seja um arquivo de texto com nomes
 
         int line_number = 0;
+        char buffer[1000];
 
-        char c;
-        for (c = getc(input_file); c != EOF; c = getc(input_file)) {
-            // Read the number of lines in the file
-            if (c == '\n')
-                line_number++;
+        // Contar número de linhas
+        while (fgets(buffer, sizeof(buffer), input_file) != NULL) {
+            line_number++;
         }
 
-        rewind(input_file);
-        // Move o pointer para o inicio do arquivo
+        rewind(input_file); //  Voltar ao início do arquivo
 
-        printf("numero de linhas: %d\n", line_number+1);
+        // Alocar espaço para os nomes
+        char **nomes = malloc(sizeof(char*) * line_number);
 
-        int *tamanho_dos_nomes = malloc(sizeof(int) * line_number);
-        
-        int name_size = 0;
-        int name_posi = 0;
-        int combined_names_size = 0;
-        do {
-            c = getc(input_file);
+        for (int i = 0; i < line_number; i++) {
+            fgets(buffer, sizeof(buffer), input_file);
+            buffer[strcspn(buffer, "\n")] = '\0'; // Remove o '\n'
 
-            if (c == '\n') {
-                tamanho_dos_nomes[name_posi] = name_size;
-                name_size=0;
-                name_posi++;
-            } else {
-                name_size++;
-                combined_names_size++;
-            }
+            nomes[i] = malloc(strlen(buffer) + 1);
+            strcpy(nomes[i], buffer); // Copia o nome
+        }
 
-        } while (c != EOF);
+        //Ordenar os nomes
+        qsort(nomes, line_number, sizeof(char *), comp_str);
 
+        //  Escrever nomeno arquivo de saída
+        for (int i = 0; i < line_number; i++) {
+            fprintf(output_file, "%s\n", nomes[i]);
+            free(nomes[i]); // Liberar memória individual
+        }
 
-        tamanho_dos_nomes[name_posi] = name_size;
-        // Adiciona o ultimo elemento
-
-        // Alocar memoria para o array de nomes
-        // Inicializar as strings dos nomes
-
-
+        free(nomes); // Liberar array de ponteiros
 
     } else if (strcmp(argv[1], "-f") == 0) {
-        // Caso seja um arquivo de numeros
-
         int line_number = 0;
 
+        // Conta o numero de linhas no arquivo
         char c;
         for (c = getc(input_file); c != EOF; c = getc(input_file)) {
-            // Read the number of lines in the file
             if (c == '\n')
                 line_number++;
         }
 
+        // Move o cursor de volta para o inicio
         rewind(input_file);
-        // Move o pointer para o inicio do arquivo
 
+        // Aloca memoria para a lista de numeros
         float *line_values = malloc(sizeof(float)*line_number);
 
-        
         for (int posi=0; posi <= line_number; posi++) {
+            // Le todos os numeros para a lista
             fscanf(input_file, "%f", &line_values[posi]);
-            // Le os valores para um array
         }
 
+        // Ordena a lista de numeros
         qsort(line_values,line_number+1, sizeof(float), comp);
-        // Organiza os valores
 
+        // Escreve os numeros da lista para o arquivo de output
         for(int i = 0; i <=line_number; i++) {
             fprintf(output_file,"%.1f\n", line_values[i]);
-            // Coloca todos os valores no arquivo de final
         }
 
+        // Libera a memoria utilizada para a lista
         free(line_values);
 
     } else {
         printf("Opcao invalida, tente novamente\n");
-
     }
 
+    // Fecha os dois arquivos
     fclose(input_file);
     fclose(output_file);
-    // Fecha os arquivos utilizados
 
     return 0;
 }
