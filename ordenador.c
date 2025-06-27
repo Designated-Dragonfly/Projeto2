@@ -106,6 +106,7 @@ int main(int argc, char* argv[]) {
         for (int posi=0; posi <= line_number; posi++) {
             // Le todos os numeros para a lista
             fscanf(input_file, "%f", &line_values[posi]);
+            
         }
 
         // Ordena a lista de numeros
@@ -113,7 +114,8 @@ int main(int argc, char* argv[]) {
 
         // Escreve os numeros da lista para o arquivo de output
         for(int i = 0; i <=line_number; i++) {
-            fprintf(output_file,"%.1f\n", line_values[i]);
+            fprintf(output_file,"%.8f\n", line_values[i]);
+            printf("%f\n", line_values[i]);
         }
 
         // Libera a memoria utilizada para a lista
