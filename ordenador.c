@@ -4,7 +4,7 @@
 
 // Funcao para comparacao de numeros
 int comp(const void *a, const void *b) {
-    return (*(int *)a - *(int *)b);
+    return (*(float *)a - *(float *)b);
 }
 
 //Funcao de comparação para strings
@@ -110,12 +110,12 @@ int main(int argc, char* argv[]) {
         }
 
         // Ordena a lista de numeros
-        qsort(line_values,line_number+1, sizeof(float), comp);
+        qsort(line_values, line_number+1, sizeof(float), comp);
+        
 
         // Escreve os numeros da lista para o arquivo de output
         for(int i = 0; i <=line_number; i++) {
             fprintf(output_file,"%.8f\n", line_values[i]);
-            printf("%f\n", line_values[i]);
         }
 
         // Libera a memoria utilizada para a lista
